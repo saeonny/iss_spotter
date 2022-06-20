@@ -18,6 +18,7 @@
   "homepage": "https://github.com/saeonny/iss_spotter#readme",
   "dependencies": {
     "eslint": "^8.17.0",
+    "package": "^1.0.1",
     "request": "^2.88.2"
   }
 }

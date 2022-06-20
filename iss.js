@@ -30,10 +30,12 @@ const fetchCoordsByIP = function(ip,callback) {
   const url = 'https://api.ipbase.com/v2/info?apikey=sOMbkXchSpLLP6niglm11aPQM48nyMJptu0H1Mgu&ip=' + ip;
   request(url,(error,response,body)=>{
     if (error) {
-      callback(error, null);
+      const mag = 'fetching error'
+      callback(Error(mag), null);
       return;
     }
     // if non-200 status, assume server error
+    
     if (response.statusCode !== 200) {
       const msg = `Status Code ${response.statusCode} when fetching coordinates for IP. Response: ${body}`;
       callback(Error(msg), null);
@@ -58,6 +60,7 @@ const fetchISSFlyOverTimes = function(coords, callback) {
   const URL = `https://iss-pass.herokuapp.com/json/?lat=${lat}&lon=${long}`
 
   request(URL,(error,response,body) => {
+   
     if(error){
       callback(error,null);
       return;
@@ -74,6 +77,28 @@ const fetchISSFlyOverTimes = function(coords, callback) {
 
 };
 
+const nextISSTimesForMyLocation = function(callback) {
+  fetchMyIP((error, ip) => {
+    if (error) {
+      return callback(error, null);
+    }
+
+    fetchCoordsByIP(ip, (error, loc) => {
+      if (error) {
+        return callback(error, null);
+      }
+
+      fetchISSFlyOverTimes(loc, (error, nextPasses) => {
+        if (error) {
+          return callback(error, null);
+        }
+
+        callback(null, nextPasses);
+      });
+    });
+  });
+};
 
 
-module.exports = { fetchMyIP , fetchCoordsByIP, fetchISSFlyOverTimes };
+
+module.exports = { fetchMyIP , fetchCoordsByIP, fetchISSFlyOverTimes, nextISSTimesForMyLocation };
